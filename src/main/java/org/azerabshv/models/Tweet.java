@@ -61,8 +61,12 @@ public class Tweet {
         this.content = content;
         this.createdAt = createdAt;
         this.user = user;
-        this.replyTo = replyTo;
-        this.quoteTo = quoteTo;
+        if (replyTo != null) {
+            this.replyTo = replyTo;
+        }
+        if (quoteTo != null) {
+            this.quoteTo = quoteTo;
+        }
     }
 
     public Tweet(String mediaUrl, String content, TweetTypeEnum tweetType, int replyCount, long replyTo, int likeCount, int retweetCount, int quoteCount, Date createdAt, User user, List<User> users, List<User> likedUsers, List<User> retweetedUsers, Long quoteTo) {

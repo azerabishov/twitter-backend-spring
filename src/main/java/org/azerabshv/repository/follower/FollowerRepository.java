@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FollowerRepository extends JpaRepository<Follower, Long> {
-    @Query("select * from followers f where f.follower_id = ?1 and f.following_id = ?2")
+    @Query(value = "select * from followers where followers.follower_id = :followerId and followers.following_id = :followingId", nativeQuery = true)
     Optional<Follower> findRecord(long followerId, long followingId);
 
-    @Query("select u.avatar_url, u.username, u.screen_name, u.bio from followers f join users u where f.follower_id = ?1")
+//    @Query(value="select users.avatar_url, users.username, users.screen_name, users.bio from followers  left join users on users.user_id = followers.follower_id where followers.follower_id = :followerId", nativeQuery=true)
+    @Query(value="select new org.azerabshv.dto.response.UserDetailDto(u.avatarUrl, u.username, u.screenName, u.bio) from Follower f  left join User u on u.userId = f.followerId where f.followerId = :followerId")
     List<UserDetailDto> findAllFollowings(long followerId);
 
-    @Query("select u.avatar_url, u.username, u.screen_name, u.bio from followers f join users u where f.following_id = ?1")
+    @Query(value = "select new org.azerabshv.dto.response.UserDetailDto(u.avatarUrl, u.username, u.screenName, u.bio) from Follower f  left join User u on u.userId = f.followingId where f.followingId = :followingId")
     List<UserDetailDto> findAllFollowers(long followingId);
 
 }

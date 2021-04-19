@@ -15,6 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,14 +44,22 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("profile/update")
-    public void updateProfile(@RequestParam UpdateProfileRequest updateProfileRequest){
-//        @RequestParam(value = "avatarUrl", required = false) MultipartFile avatarUrl,
-//        @RequestParam(value = "profileBackgroundImageUrl", required = false) MultipartFile profileBackgroundImageUrl,
-//        @RequestParam(value = "screenName", required = false) String screenName,
-//        @RequestParam(value = "bio", required = false) String bio,
-//        @RequestParam(value = "location", required = false) String location,
-//        @RequestParam(value = "website", required = false) String website,
-//        @RequestParam(value = "birthdate", required = false) Date birthdate
+    public void updateProfile(
+            @RequestParam(value = "avatarUrl", required = false) MultipartFile avatarUrl,
+            @RequestParam(value = "profileBackgroundImageUrl", required = false) MultipartFile profileBackgroundImageUrl,
+            @RequestParam(value = "screenName", required = false) String screenName,
+            @RequestParam(value = "bio", required = false) String bio,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "website", required = false) String website
+    ) throws ParseException {
+        UpdateProfileRequest updateProfileRequest = UpdateProfileRequest.builder()
+                .avatarUrl(avatarUrl)
+                .profileBackgroundImageUrl(profileBackgroundImageUrl)
+                .screenName(screenName)
+                .bio(bio)
+                .location(location)
+                .website(website)
+                .build();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();

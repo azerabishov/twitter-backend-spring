@@ -14,12 +14,14 @@ import org.azerabshv.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class TweetServiceImpl implements TweetService {
     @Autowired
     UserService userService;
@@ -39,8 +41,7 @@ public class TweetServiceImpl implements TweetService {
         User user = userService.getUser(userId);
         String filename;
         if(contentFile != null) {
-            fileService.save(contentFile);
-            filename = contentFile.getOriginalFilename();
+            filename = fileService.save(contentFile);
         }else{
             filename = null;
         }
@@ -97,11 +98,11 @@ public class TweetServiceImpl implements TweetService {
 
         String filename;
         if(contentFile != null) {
-            fileService.save(contentFile);
-            filename = contentFile.getOriginalFilename();
+            filename = fileService.save(contentFile);
         }else{
             filename = null;
         }
+
         tweet.setReplyCount(tweet.getReplyCount()+1);
         Tweet replyTweet = new Tweet( filename, content, new Date(), user, tweetId, null );
         tweetRepository.save(replyTweet);
@@ -140,8 +141,7 @@ public class TweetServiceImpl implements TweetService {
 
         String filename;
         if(contentFile != null) {
-            fileService.save(contentFile);
-            filename = contentFile.getOriginalFilename();
+            filename = fileService.save(contentFile);
         }else{
             filename = null;
         }

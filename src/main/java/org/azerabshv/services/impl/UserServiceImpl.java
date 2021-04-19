@@ -18,10 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+
+@Service
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
@@ -134,21 +137,21 @@ public class UserServiceImpl implements UserService {
         user.setLocation(updateProfileRequest.getLocation());
         user.setWebsite(updateProfileRequest.getWebsite());
         user.setBirthdate(updateProfileRequest.getBirthdate());
-        if (updateProfileRequest.getAvatarUrl() != null) {
-            fileService.save(updateProfileRequest.getAvatarUrl());
-            user.setAvatarUrl(updateProfileRequest.getAvatarUrl().getOriginalFilename());
+        if (!updateProfileRequest.getAvatarUrl().getOriginalFilename().isEmpty()) {
+            String filename = fileService.save(updateProfileRequest.getAvatarUrl());
+            user.setAvatarUrl(filename);
         }
-        if (updateProfileRequest.getProfileBackgroundImageUrl() != null) {
-            fileService.save(updateProfileRequest.getProfileBackgroundImageUrl());
-            user.setAvatarUrl(updateProfileRequest.getProfileBackgroundImageUrl().getOriginalFilename());
+        if (!updateProfileRequest.getProfileBackgroundImageUrl().getOriginalFilename().isEmpty()) {
+            String filename = fileService.save(updateProfileRequest.getProfileBackgroundImageUrl());
+            user.setAvatarUrl(filename);
         }
         return userRepository.save(user);
     }
 
     private User updateUserPassword(User user, UpdatePasswordRequest passwordRequest) {
-        if (encoder.matches(passwordRequest.getNewPassword(), user.getPassword())){
+        if (encoder.matches(passwordRequest.getCurrentPass(), user.getPassword())){
             if (passwordRequest.getNewPassword().equals(passwordRequest.getNewPasswordConfirmation())) {
-                user.setPassword(passwordRequest.getNewPassword());
+                user.setPassword(encoder.encode(passwordRequest.getNewPassword()));
                 return userRepository.save(user);
             }else {
                 throw new InvalidUsernameOrPasswordException();
@@ -160,7 +163,7 @@ public class UserServiceImpl implements UserService {
 
     private Follower followUser(User user, User targetUser) {
         targetUser.setFollowerCount(targetUser.getFollowerCount()+1);
-        user.setFollowingCount(targetUser.getFollowingCount()+1);
+        user.setFollowingCount(user.getFollowingCount()+1);
         userRepository.save(targetUser);
         userRepository.save(user);
         return followerRepository.save(new Follower(user.getUserId(), targetUser.getUserId()));
@@ -169,7 +172,7 @@ public class UserServiceImpl implements UserService {
 
     private Follower unfollowUser(User user, User targetUser) {
         targetUser.setFollowerCount(targetUser.getFollowerCount()-1);
-        user.setFollowingCount(targetUser.getFollowingCount()-1);
+        user.setFollowingCount(user.getFollowingCount()-1);
         userRepository.save(targetUser);
         userRepository.save(user);
         return followerRepository.findRecord(user.getUserId(), targetUser.getUserId())

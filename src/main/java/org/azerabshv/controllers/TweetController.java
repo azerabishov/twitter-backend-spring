@@ -1,9 +1,6 @@
 package org.azerabshv.controllers;
 
-import org.azerabshv.dto.response.MessageResponse;
 import org.azerabshv.dto.response.TweetDetailDto;
-import org.azerabshv.models.Tweet;
-import org.azerabshv.models.User;
 import org.azerabshv.repository.tweet.TweetRepository;
 import org.azerabshv.repository.user.UserRepository;
 import org.azerabshv.security.UserDetailsImpl;
@@ -17,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.temporal.Temporal;
 import java.util.*;
 
 @RestController
@@ -25,16 +21,6 @@ import java.util.*;
 public class TweetController {
     @Autowired
     TweetService tweetService;
-
-    @Autowired
-    FileService fileService;
-
-    @Autowired
-    TweetRepository tweetRepository;
-
-
-    @Autowired
-    UserRepository userRepository;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
@@ -73,7 +59,7 @@ public class TweetController {
         return tweetService.likeTweet(userPrincipal.getId(), tweetId);
     }
 
-    @PostMapping("retweet/{id}")
+    @GetMapping("retweet/{id}")
     public ResponseEntity<?> retweetTweet(@PathVariable("id") long tweetId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();

@@ -5,5 +5,5 @@ import org.azerabshv.models.Mail;
 import javax.mail.MessagingException;
 
 public interface EmailService {
-    void sendMail(Mail mail) throws MessagingException;
+    void sendMail(String token, String userEmal) throws MessagingException;
 }

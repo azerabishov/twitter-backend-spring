@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -43,7 +42,7 @@ public class User {
             inverseJoinColumns = {
                     @JoinColumn(name = "tweet_id", referencedColumnName = "tweet_id",
                             nullable = false, updatable = false)})
-    private List<User> bookmarks;
+    private List<Tweet> bookmarks;
     @ManyToMany(targetEntity = Tweet.class,  cascade = CascadeType.ALL)
     @JoinTable(name = "likes",
             joinColumns = {
@@ -52,7 +51,7 @@ public class User {
             inverseJoinColumns = {
                     @JoinColumn(name = "tweet_id", referencedColumnName = "tweet_id",
                             nullable = false, updatable = false)})
-    private List<User> likes;
+    private List<Tweet> likes;
     @ManyToMany(targetEntity = Tweet.class,  cascade = CascadeType.ALL)
     @JoinTable(name = "retweets",
             joinColumns = {
@@ -61,7 +60,7 @@ public class User {
             inverseJoinColumns = {
                     @JoinColumn(name = "tweet_id", referencedColumnName = "tweet_id",
                             nullable = false, updatable = false)})
-    private List<User> retweets;
+    private List<Tweet> retweets;
     @Column(name = "forgot_password_token")
     private String forgotPasswordToken;
     @Column(name = "forgot_password_token_created_at")
@@ -105,30 +104,6 @@ public class User {
         this.forgotPasswordTokenCreatedAt = forgotPasswordTokenCreatedAt;
         this.birthdate = birthdate;
         this.createdAt = createdAt;
-    }
-
-    public List<Tweet> getTweets() {
-        return tweets;
-    }
-
-    public void setTweets(List<Tweet> tweets) {
-        this.tweets = tweets;
-    }
-
-    public List<User> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<User> likes) {
-        this.likes = likes;
-    }
-
-    public List<User> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setBookmarks(List<User> bookmarks) {
-        this.bookmarks = bookmarks;
     }
 
     public long getUserId() {
@@ -241,6 +216,38 @@ public class User {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    public List<Tweet> getBookmarks() {
+        return bookmarks;
+    }
+
+    public void setBookmarks(List<Tweet> bookmarks) {
+        this.bookmarks = bookmarks;
+    }
+
+    public List<Tweet> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Tweet> likes) {
+        this.likes = likes;
+    }
+
+    public List<Tweet> getRetweets() {
+        return retweets;
+    }
+
+    public void setRetweets(List<Tweet> retweets) {
+        this.retweets = retweets;
     }
 
     public String getForgotPasswordToken() {

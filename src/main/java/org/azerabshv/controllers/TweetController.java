@@ -1,13 +1,14 @@
 package org.azerabshv.controllers;
 
 import org.azerabshv.dto.response.MessageResponse;
-import org.azerabshv.dto.response.TweetDto;
+import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.models.Tweet;
 import org.azerabshv.models.User;
 import org.azerabshv.repository.tweet.TweetRepository;
 import org.azerabshv.repository.user.UserRepository;
 import org.azerabshv.security.UserDetailsImpl;
 import org.azerabshv.services.FileService;
+import org.azerabshv.services.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.temporal.Temporal;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/tweet")
 public class TweetController {
+    @Autowired
+    TweetService tweetService;
 
     @Autowired
     FileService fileService;
@@ -28,103 +32,62 @@ public class TweetController {
     @Autowired
     TweetRepository tweetRepository;
 
+
     @Autowired
     UserRepository userRepository;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
-    public ResponseEntity<?> createTweet(@RequestParam("mediaUrl") MultipartFile file, @RequestParam("content") String content){
+    public void createTweet(@RequestParam(value = "mediaUrl", required = false) MultipartFile contentFile, @RequestParam("content") String content){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        Optional<User> user = userRepository.findById( userPrincipal.getId());
-        String message = "";
-        try {
-            fileService.save(file);
-            Tweet tweet = new Tweet(
-                    file.getOriginalFilename(),
-                    content,
-                    new Date(),
-                    user.get()
-            );
-            tweetRepository.save(tweet);
-            message = "Uploaded the file successfully: " + file.getOriginalFilename();
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
-        } catch (Exception e) {
-            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
-        }
+        tweetService.createTweet(contentFile, content, userPrincipal.getId());
     }
 
-    @GetMapping("/get/:id")
-    public ResponseEntity<?> getTweet(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        Optional<User> user = userRepository.findById( userPrincipal.getId());
-        List<TweetDto> tweets = new ArrayList<>();
-        for (Tweet tweet : user.get().getTweets()) {
-            tweets.add(new TweetDto(tweet.getMediaUrl(), tweet.getContent(), tweet.getCreatedAt()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(tweets);
+    @GetMapping("/get/{id}")
+    public TweetDetailDto getTweet(@PathVariable("id") long id){
+        return tweetService.getTweetDetail(id);
     }
 
-    @GetMapping("/get/responses")
-    public ResponseEntity<?> getTweetResponses(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        Optional<User> user = userRepository.findById( userPrincipal.getId());
-        List<TweetDto> tweets = new ArrayList<>();
-        for (Tweet tweet : user.get().getTweets()) {
-            tweets.add(new TweetDto(tweet.getMediaUrl(), tweet.getContent(), tweet.getCreatedAt()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(tweets);
+    @GetMapping("/get/{id}/replies")
+    public List<TweetDetailDto> getTweetResponses(@PathVariable("id") Long id){
+        return tweetService.getTweetReplies(id);
     }
-//    @GetMapping("/get")
-//    public ResponseEntity<?> getTweets(){
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-//        Optional<User> user = userRepository.findById( userPrincipal.getId());
-//        List<TweetDto> tweets = new ArrayList<>();
-//        for (Tweet tweet : user.get().getTweets()) {
-//            tweets.add(new TweetDto(tweet.getMediaUrl(), tweet.getContent(), tweet.getCreatedAt()));
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body(tweets);
-//    }
 
-    @PostMapping("/reply")
-    public ResponseEntity<?> responseToTweet(
-            @RequestParam(value = "mediaUrl", required = false) MultipartFile file,
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{id}/reply")
+    public void responseToTweet(
+            @RequestParam(value = "mediaUrl", required = false) MultipartFile contentFile,
             @RequestParam(value = "content") String content,
-            @RequestParam(value = "replyTo") Long replyTo){
+            @PathVariable("id") Long tweetId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        Optional<User> user = userRepository.findById( userPrincipal.getId());
-        String message = "";
-        String filename;
-        try {
-            if(file != null) {
-                fileService.save(file);
-                filename = file.getOriginalFilename();
-            }else{
-                filename = null;
-            }
-            Tweet tweet = new Tweet(
-                    filename,
-                    content,
-                    new Date(),
-                    user.get(),
-                    replyTo
-            );
-
-            tweetRepository.save(tweet);
-            message = "Uploaded the file successfully: " + filename;
-            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
-        } catch (Exception e) {
-            message = "Could not upload the file: !";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
-        }
+        tweetService.replyTweet(userPrincipal.getId(), tweetId, contentFile, content);
     }
 
 
+    @GetMapping("like/{id}")
+    public ResponseEntity<?> likeTweet(@PathVariable("id") long tweetId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
+        return tweetService.likeTweet(userPrincipal.getId(), tweetId);
+    }
 
+    @PostMapping("retweet/{id}")
+    public ResponseEntity<?> retweetTweet(@PathVariable("id") long tweetId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
+        return tweetService.retweetTweet(userPrincipal.getId(), tweetId);
+    }
 
-
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("quote/{id}")
+    public void likeTweet(
+            @RequestParam(value = "mediaUrl", required = false) MultipartFile contenFile,
+            @RequestParam(value = "content") String content,
+            @PathVariable("id") Long tweetId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
+        tweetService.quoteTweet(userPrincipal.getId(), tweetId, contenFile, content);
+    }
 }

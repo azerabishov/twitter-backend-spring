@@ -19,13 +19,17 @@ public class Tweet {
     @Enumerated(EnumType.STRING)
     private TweetTypeEnum tweetType;
     @Column(name = "reply_count")
-    private String replyCount;
+    private int replyCount;
     @Column(name = "reply_to")
-    private long replyTo;
+    private Long replyTo;
+    @Column(name = "quote_to")
+    private long quoteTo;
     @Column(name = "like_count")
-    private String likeCount;
+    private int likeCount;
     @Column(name = "retweet_count")
-    private String retweetCount;
+    private int retweetCount;
+    @Column(name = "quote_count")
+    private int quoteCount;
     @Column(name = "created_at", columnDefinition = "TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP")
     private Date createdAt;
 
@@ -52,15 +56,16 @@ public class Tweet {
         this.user = user;
     }
 
-    public Tweet(String mediaUrl, String content, Date createdAt, User user, Long replyTo) {
+    public Tweet(String mediaUrl, String content, Date createdAt, User user, Long replyTo, Long quoteTo) {
         this.mediaUrl = mediaUrl;
         this.content = content;
         this.createdAt = createdAt;
         this.user = user;
         this.replyTo = replyTo;
+        this.quoteTo = quoteTo;
     }
 
-    public Tweet(String mediaUrl, String content, TweetTypeEnum tweetType, String replyCount, long replyTo, String likeCount, String retweetCount, Date createdAt) {
+    public Tweet(String mediaUrl, String content, TweetTypeEnum tweetType, int replyCount, long replyTo, int likeCount, int retweetCount, int quoteCount, Date createdAt, User user, List<User> users, List<User> likedUsers, List<User> retweetedUsers, Long quoteTo) {
         this.mediaUrl = mediaUrl;
         this.content = content;
         this.tweetType = tweetType;
@@ -68,9 +73,14 @@ public class Tweet {
         this.replyTo = replyTo;
         this.likeCount = likeCount;
         this.retweetCount = retweetCount;
+        this.quoteCount = quoteCount;
         this.createdAt = createdAt;
+        this.user = user;
+        this.users = users;
+        this.likedUsers = likedUsers;
+        this.retweetedUsers = retweetedUsers;
+        this.quoteTo = quoteTo;
     }
-
 
     public long getTweetId() {
         return tweetId;
@@ -104,36 +114,52 @@ public class Tweet {
         this.tweetType = tweetType;
     }
 
-    public String getReplyCount() {
+    public int getReplyCount() {
         return replyCount;
     }
 
-    public void setReplyCount(String replyCount) {
+    public void setReplyCount(int replyCount) {
         this.replyCount = replyCount;
     }
 
-    public long getReplyTo() {
+    public Long getReplyTo() {
         return replyTo;
     }
 
-    public void setReplyTo(long relpyTo) {
-        this.replyTo = relpyTo;
+    public void setReplyTo(Long replyTo) {
+        this.replyTo = replyTo;
     }
 
-    public String getLikeCount() {
+    public long getQuoteTo() {
+        return quoteTo;
+    }
+
+    public void setQuoteTo(long quoteTo) {
+        this.quoteTo = quoteTo;
+    }
+
+    public int getLikeCount() {
         return likeCount;
     }
 
-    public void setLikeCount(String likeCount) {
+    public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
 
-    public String getRetweetCount() {
+    public int getRetweetCount() {
         return retweetCount;
     }
 
-    public void setRetweetCount(String retweetCount) {
+    public void setRetweetCount(int retweetCount) {
         this.retweetCount = retweetCount;
+    }
+
+    public int getQuoteCount() {
+        return quoteCount;
+    }
+
+    public void setQuoteCount(int quoteCount) {
+        this.quoteCount = quoteCount;
     }
 
     public Date getCreatedAt() {
@@ -152,20 +178,20 @@ public class Tweet {
         this.user = user;
     }
 
-    public List<User> getLikedUsers() {
-        return likedUsers;
-    }
-
-    public void setLikedUsers(List<User> likedUsers) {
-        this.likedUsers = likedUsers;
-    }
-
     public List<User> getUsers() {
         return users;
     }
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public List<User> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(List<User> likedUsers) {
+        this.likedUsers = likedUsers;
     }
 
     public List<User> getRetweetedUsers() {

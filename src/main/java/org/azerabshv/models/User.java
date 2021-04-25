@@ -12,6 +12,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private long userId;
+    private String website;
     private String username;
     @Column(name = "screen_name")
     private String screenName;
@@ -25,13 +26,12 @@ public class User {
     private String profileBackgroundImageUrl;
     @Column(name = "follower_count", columnDefinition = "integer not null default 0")
     private int followerCount;
-    @Column(name="following_count", columnDefinition = "integer not null default 0")
-    private int followingCount;
+    @Column(name="friend_count", columnDefinition = "integer not null default 0")
+    private int friendCount;
     @Column(name = "is_protected", columnDefinition = "boolean not null default false")
     private boolean isProtected;
     private String bio;
     private String location;
-    private String website;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Tweet> tweets;
     @ManyToMany(targetEntity = Tweet.class,  cascade = CascadeType.ALL)
@@ -86,7 +86,7 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public User(String username,  String email, String phoneNumber, String password, String avatarUrl, String screenName, String profileBackgroundImageUrl, int followerCount, int followingCount, boolean isProtected, String bio, String location, String website, Date birthdate, Timestamp createdAt, String forgotPasswordToken, Timestamp forgotPasswordTokenCreatedAt) {
+    public User(String username,  String email, String phoneNumber, String password, String avatarUrl, String screenName, String profileBackgroundImageUrl, int followerCount, int friendCount, boolean isProtected, String bio, String location, String website, Date birthdate, Timestamp createdAt, String forgotPasswordToken, Timestamp forgotPasswordTokenCreatedAt) {
         this.username = username;
         this.screenName = screenName;
         this.email = email;
@@ -95,7 +95,7 @@ public class User {
         this.avatarUrl = avatarUrl;
         this.profileBackgroundImageUrl = profileBackgroundImageUrl;
         this.followerCount = followerCount;
-        this.followingCount = followingCount;
+        this.friendCount = friendCount;
         this.isProtected = isProtected;
         this.bio = bio;
         this.location = location;
@@ -178,12 +178,12 @@ public class User {
         this.followerCount = followerCount;
     }
 
-    public int getFollowingCount() {
-        return followingCount;
+    public int getFriendCount() {
+        return friendCount;
     }
 
-    public void setFollowingCount(int followingCount) {
-        this.followingCount = followingCount;
+    public void setFriendCount(int friendCount) {
+        this.friendCount = friendCount;
     }
 
     public boolean isProtected() {

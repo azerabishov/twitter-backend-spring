@@ -4,8 +4,8 @@ package org.azerabshv.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "followers")
-public class Follower {
+@Table(name = "follows")
+public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -14,10 +14,10 @@ public class Follower {
     @Column(name = "following_id")
     private long followingId;
 
-    public Follower() {
+    public Follow() {
     }
 
-    public Follower(long followerId, long followingId) {
+    public Follow(long followerId, long followingId) {
         this.followerId = followerId;
         this.followingId = followingId;
     }

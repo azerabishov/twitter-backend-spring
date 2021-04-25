@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDetailDto {
-    String avatarUrl;
-    String username;
-    String screenName;
-    String bio;
+    private String avatarUrl;
+    private String username;
+    private String screenName;
+    private String bio;
 }

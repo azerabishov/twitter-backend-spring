@@ -23,5 +23,5 @@ public class UserProfileDto {
     Date createdAt;
     Date birthday;
     int followerCount;
-    int followingCount;
+    int friendCount;
 }

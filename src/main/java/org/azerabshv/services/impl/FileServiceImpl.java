@@ -29,9 +29,13 @@ public class FileServiceImpl implements FileService {
     @Override
     public String save(MultipartFile file) {
         try {
-            String filename = System.currentTimeMillis() + file.getOriginalFilename();
-            Files.copy(file.getInputStream(), this.root.resolve(filename));
-            return filename;
+            if(file != null) {
+                String filename = System.currentTimeMillis() + file.getOriginalFilename();
+                Files.copy(file.getInputStream(), this.root.resolve(filename));
+                return filename;
+            }else{
+                return null;
+            }
         } catch (Exception e) {
             throw new RuntimeException("Could not store the file. Error: " + e);
         }

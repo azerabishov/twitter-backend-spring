@@ -1,5 +1,6 @@
 package org.azerabshv.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.request.LoginRequest;
 import org.azerabshv.dto.request.ResetPasswordRequest;
 import org.azerabshv.dto.request.SignupRequest;
@@ -12,9 +13,9 @@ import org.azerabshv.models.User;
 import org.azerabshv.repository.user.UserRepository;
 import org.azerabshv.security.UserDetailsImpl;
 import org.azerabshv.services.AuthService;
+import org.azerabshv.services.EmailService;
 import org.azerabshv.utils.JwtUtils;
 import org.azerabshv.utils.StringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,32 +31,24 @@ import java.util.Date;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    EmailServiceImpl emailService;
+    private final EmailService emailService;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
-    @Autowired
-    JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public void register(SignupRequest signupRequest) {
         userRepository.findByUsername(signupRequest.getUsername())
-                .ifPresent(user -> {
-                    throw new UsernameAlreadyExistsException();
-                });
+                .ifPresent(user -> { throw new UsernameAlreadyExistsException(); });
         userRepository.findByEmail(signupRequest.getEmail())
-                .ifPresent(user -> {
-                    throw new EmailAlreadyExistsException();
-                });
+                .ifPresent(user -> { throw new EmailAlreadyExistsException(); });
 
         createUser(signupRequest);
     }
@@ -98,6 +91,21 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(InvalidTokenException::new);
 
         return ResponseEntity.status(HttpStatus.OK).body("Your password has been reset");
+    }
+
+    @Override
+    public User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
+        return userRepository.findById(userPrincipal.getId())
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
+        return userPrincipal.getId();
     }
 
     public void createUser(SignupRequest signupRequest) {

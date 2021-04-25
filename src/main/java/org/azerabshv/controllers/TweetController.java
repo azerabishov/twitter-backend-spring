@@ -1,6 +1,8 @@
 package org.azerabshv.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.response.TweetDetailDto;
+import org.azerabshv.dto.response.UserDetailDto;
 import org.azerabshv.repository.tweet.TweetRepository;
 import org.azerabshv.repository.user.UserRepository;
 import org.azerabshv.security.UserDetailsImpl;
@@ -18,16 +20,15 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/tweet")
+@RequiredArgsConstructor
 public class TweetController {
-    @Autowired
-    TweetService tweetService;
+
+    private final TweetService tweetService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
     public void createTweet(@RequestParam(value = "mediaUrl", required = false) MultipartFile contentFile, @RequestParam("content") String content){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        tweetService.createTweet(contentFile, content, userPrincipal.getId());
+        tweetService.createTweet(contentFile, content);
     }
 
     @GetMapping("/get/{id}")
@@ -36,8 +37,23 @@ public class TweetController {
     }
 
     @GetMapping("/get/{id}/replies")
-    public List<TweetDetailDto> getTweetResponses(@PathVariable("id") Long id){
-        return tweetService.getTweetReplies(id);
+    public List<TweetDetailDto> getTweetResponses(@PathVariable("id") Long id, @RequestParam int page){
+        return tweetService.getTweetReplies(id, page);
+    }
+
+    @GetMapping("/get/{id}/likes")
+    public List<UserDetailDto> getLikes(@PathVariable("id") Long id){
+        return tweetService.getTweetLikes(id);
+    }
+
+    @GetMapping("/get/{id}/retweets")
+    public List<UserDetailDto> getRetweets(@PathVariable("id") Long id){
+        return tweetService.getTweetRetweets(id);
+    }
+
+    @GetMapping("/get/{id}/quotes")
+    public List<TweetDetailDto> getQuotes(@PathVariable("id") Long id, @RequestParam int page){
+        return tweetService.getTweetQuotes(id, page);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -46,24 +62,18 @@ public class TweetController {
             @RequestParam(value = "mediaUrl", required = false) MultipartFile contentFile,
             @RequestParam(value = "content") String content,
             @PathVariable("id") Long tweetId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        tweetService.replyTweet(userPrincipal.getId(), tweetId, contentFile, content);
+        tweetService.replyTweet(tweetId, contentFile, content);
     }
 
 
     @GetMapping("like/{id}")
     public ResponseEntity<?> likeTweet(@PathVariable("id") long tweetId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        return tweetService.likeTweet(userPrincipal.getId(), tweetId);
+        return tweetService.likeTweet(tweetId);
     }
 
     @GetMapping("retweet/{id}")
     public ResponseEntity<?> retweetTweet(@PathVariable("id") long tweetId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        return tweetService.retweetTweet(userPrincipal.getId(), tweetId);
+        return tweetService.retweetTweet(tweetId);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -72,8 +82,6 @@ public class TweetController {
             @RequestParam(value = "mediaUrl", required = false) MultipartFile contenFile,
             @RequestParam(value = "content") String content,
             @PathVariable("id") Long tweetId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        tweetService.quoteTweet(userPrincipal.getId(), tweetId, contenFile, content);
+        tweetService.quoteTweet(tweetId, contenFile, content);
     }
 }

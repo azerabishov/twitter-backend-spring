@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import javax.mail.MessagingException;
 
 public interface AuthService {
+    User getAuthenticatedUser();
+    Long getAuthenticatedUserId();
     void register(SignupRequest signupRequest);
     ResponseEntity<LoginResponse> login(LoginRequest loginRequest);
     void sendForgotPasswordEmail(String email) throws MessagingException;

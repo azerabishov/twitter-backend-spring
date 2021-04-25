@@ -1,45 +1,33 @@
 package org.azerabshv.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.request.UpdatePasswordRequest;
 import org.azerabshv.dto.request.UpdateProfileRequest;
-import org.azerabshv.dto.response.MessageResponse;
+import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserDetailDto;
 import org.azerabshv.dto.response.UserProfileDto;
-import org.azerabshv.models.User;
-import org.azerabshv.repository.follower.FollowerRepository;
-import org.azerabshv.security.UserDetailsImpl;
+import org.azerabshv.services.FollowService;
 import org.azerabshv.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/api/v1/user")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    UserService userService;
 
+    private final UserService userService;
 
-    @Autowired
-    FollowerRepository followerRepository;
+    private final FollowService followService;
 
     @GetMapping("profile")
     public UserProfileDto getProfile(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        return userService.getUserProfile(userPrincipal.getId());
+        return userService.getUserProfile();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -61,48 +49,96 @@ public class UserController {
                 .website(website)
                 .build();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        userService.updateUserProfile(userPrincipal.getId(), updateProfileRequest);
+        userService.updateUserProfile(updateProfileRequest);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("password/update")
     public void updateProfile(@RequestBody UpdatePasswordRequest passwordRequest){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        userService.updateUserPassword(userPrincipal.getId(), passwordRequest);
+        userService.updateUserPassword(passwordRequest);
     }
 
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("follow/{id}")
     public void followUser(@PathVariable("id") long targetUserId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        userService.followUser(userPrincipal.getId(), targetUserId);
+        followService.followUser(targetUserId);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("unfollow/{id}")
     public void unfollowUser(@PathVariable("id") long targetUserId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        userService.unfollowUser(userPrincipal.getId(), targetUserId);
+        followService.unfollowUser( targetUserId);
     }
 
 
-    @GetMapping("following/get")
-    public ResponseEntity<?> getFollowerList(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        return userService.getFollowerList(userPrincipal.getId());
+    @GetMapping("friends/list")
+    public List<UserDetailDto> getFriendsList(){
+        return followService.getFriendsList();
     }
 
-    @GetMapping("follower/get")
-    public ResponseEntity<?> getFollowingList(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userPrincipal = (UserDetailsImpl)authentication.getPrincipal();
-        return userService.getFollowingList(userPrincipal.getId());
+    @GetMapping("followers/list")
+    public List<UserDetailDto> getFollowerList(){
+        return followService.getFollowerList();
     }
+
+    @GetMapping("tweets")
+    public List<TweetDetailDto> getTweets(@RequestParam int page){
+        int offset;
+        if(page > 0) {
+            offset = (page-1)*10;
+        }else{
+            offset = 1;
+        }
+        return userService.getAllTweets(offset);
+    }
+
+    @GetMapping("likes")
+    public List<TweetDetailDto> getLikes(@RequestParam int page){
+        int offset;
+        if(page > 0) {
+            offset = (page-1)*10;
+        }else{
+            offset = 1;
+        }
+        return userService.getLikedTweets(offset);
+    }
+
+
+    @GetMapping("medias")
+    public List<TweetDetailDto> getMedias(@RequestParam int page){
+        int offset;
+        if(page > 0) {
+            offset = (page-1)*10;
+        }else{
+            offset = 1;
+        }
+        return userService.getTweetsWithMedia(offset);
+    }
+
+    @GetMapping("bookmark/:id")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addTweetToBookmark(@PathVariable Long tweetId){
+        userService.addTweetToBookmark(tweetId);
+    }
+
+    @GetMapping("bookmarks")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<TweetDetailDto> getBookMarks(@RequestParam int page){
+        int offset;
+        if(page > 0) {
+            offset = (page-1)*10;
+        }else{
+            offset = 1;
+        }
+        return userService.getUserBookmarks(offset);
+    }
+
+    @DeleteMapping("bookmark/:id")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeTweetFromBookmark(@PathVariable Long tweetId){
+        userService.removeTweetFromBookmark(tweetId);
+    }
+
+
 }

@@ -10,8 +10,6 @@ import javax.annotation.Resource;
 @SpringBootApplication
 public class TwitterCloneApplication  {
 
-	@Resource
-	FileService fileService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(TwitterCloneApplication.class, args);

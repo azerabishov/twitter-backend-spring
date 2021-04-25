@@ -1,5 +1,6 @@
 package org.azerabshv.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.request.ForgotPasswordRequest;
 import org.azerabshv.dto.request.LoginRequest;
 import org.azerabshv.dto.request.ResetPasswordRequest;
@@ -15,10 +16,10 @@ import javax.mail.MessagingException;
 
 @RestController
 @RequestMapping("auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    AuthService authService;
+    private final AuthService authService;
 
     @PostMapping("signin")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {

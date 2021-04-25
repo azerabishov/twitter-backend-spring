@@ -1,134 +1,108 @@
 package org.azerabshv.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.request.UpdatePasswordRequest;
 import org.azerabshv.dto.request.UpdateProfileRequest;
-import org.azerabshv.dto.response.MessageResponse;
-import org.azerabshv.dto.response.UserDetailDto;
+import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserProfileDto;
 import org.azerabshv.exception.InvalidUsernameOrPasswordException;
-import org.azerabshv.exception.RecordNotFoundException;
 import org.azerabshv.exception.UserNotFoundException;
-import org.azerabshv.models.Follower;
+import org.azerabshv.mappers.MapStructMapper;
+import org.azerabshv.models.Tweet;
 import org.azerabshv.models.User;
-import org.azerabshv.repository.follower.FollowerRepository;
 import org.azerabshv.repository.user.UserRepository;
+import org.azerabshv.services.AuthService;
 import org.azerabshv.services.FileService;
+import org.azerabshv.services.TweetService;
 import org.azerabshv.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    FileService fileService;
+    private final AuthService authService;
 
-    @Autowired
-    FollowerRepository followerRepository;
+    private final FileService fileService;
 
-    @Autowired
-    PasswordEncoder encoder;
+    private final TweetService tweetService;
+
+    private final PasswordEncoder encoder;
+
+    private final MapStructMapper mapstructMapper;
+
 
 
     @Override
-    public User getUser(long userId) {
+    public UserProfileDto getUserProfile() {
+        long userId = authService.getAuthenticatedUserId();
         return userRepository.findById(userId)
+                .map(mapstructMapper::userToUserProfileDto)
                 .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
-    public UserProfileDto getUserProfile(long userId) {
-        return userRepository.findById(userId)
-                .map(this::getUserProfile)
-                .orElseThrow(UserNotFoundException::new);
-    }
-
-    @Override
-    public void updateUserProfile(long userId, UpdateProfileRequest updateProfileRequest) {
+    public void updateUserProfile(UpdateProfileRequest updateProfileRequest) {
+        long userId = authService.getAuthenticatedUserId();
         userRepository.findById(userId)
                 .map(user -> updateUserPorfile(user, updateProfileRequest))
                 .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
-    public void updateUserPassword(long userId, UpdatePasswordRequest passwordRequest) {
+    public void updateUserPassword(UpdatePasswordRequest passwordRequest) {
+        long userId = authService.getAuthenticatedUserId();
         userRepository.findById(userId)
                 .map(user -> updateUserPassword(user, passwordRequest))
                 .orElseThrow(UserNotFoundException::new);
     }
 
+
     @Override
-    public void followUser(long userId, long targetUserId) {
-        User targetUser;
-        Optional<User> targetUserData = userRepository.findById(targetUserId);
-        if (targetUserData.isPresent()) {
-            targetUser = targetUserData.get();
-        } else {
-            throw new UserNotFoundException();
-        }
-        userRepository.findById(userId)
-                .map(user -> followUser(user, targetUser))
-                .orElseThrow(UserNotFoundException::new);
+    public List<TweetDetailDto> getAllTweets(int offset) {
+        List<Tweet> tweets = tweetService.getTweetByUser( offset);
+        return mapstructMapper.tweetsToTweetDetailsDto(tweets);
     }
 
     @Override
-    public void unfollowUser(long userId, long targetUserId) {
-        User targetUser;
-        Optional<User> targetUserData = userRepository.findById(targetUserId);
-        if (targetUserData.isPresent()) {
-            targetUser = targetUserData.get();
-        } else {
-            throw new UserNotFoundException();
-        }
-        userRepository.findById(userId)
-                .map(user -> unfollowUser(user, targetUser))
-                .orElseThrow(UserNotFoundException::new);
+    public List<TweetDetailDto> getLikedTweets(int offset) {
+        List<Tweet> likedTweets = tweetService.getTweetByUserLikes(offset);
+        return mapstructMapper.tweetsToTweetDetailsDto(likedTweets);
     }
 
     @Override
-    public ResponseEntity<?> getFollowerList(long userId) {
-        return userRepository.findById(userId)
-                .map(user -> {
-                    List<UserDetailDto> followingsList = followerRepository.findAllFollowings(userId);
-                    return ResponseEntity.status(HttpStatus.OK).body(followingsList);
-                })
-                .orElseThrow(UserNotFoundException::new);
+    public List<TweetDetailDto> getTweetsWithMedia(int offset) {
+        List<Tweet> tweetsWithMedia = tweetService.getTweetWithMedia(offset);
+        return mapstructMapper.tweetsToTweetDetailsDto(tweetsWithMedia);
     }
 
     @Override
-    public ResponseEntity<?> getFollowingList(long userId) {
-        return userRepository.findById(userId)
-                .map(user -> {
-                    List<UserDetailDto> followersList = followerRepository.findAllFollowers(userId);
-                    return ResponseEntity.status(HttpStatus.OK).body(followersList);
-                })
-                .orElseThrow(UserNotFoundException::new);
+    public void addTweetToBookmark(long tweetId) {
+        User user = authService.getAuthenticatedUser();
+        Tweet tweet = tweetService.getTweet(tweetId);
+        user.getBookmarks().add(tweet);
+        userRepository.save(user);
     }
 
-
-    private UserProfileDto getUserProfile(User user) {
-        return UserProfileDto.builder()
-                .username(user.getUsername())
-                .screenName(user.getScreenName())
-                .avatarUrl(user.getAvatarUrl())
-                .profileBackgroundImageUrl(user.getProfileBackgroundImageUrl())
-                .bio(user.getBio())
-                .location(user.getLocation())
-                .website(user.getWebsite())
-                .birthday(user.getBirthdate())
-                .followerCount(user.getFollowerCount())
-                .followingCount(user.getFollowingCount())
-                .build();
+    @Override
+    public void removeTweetFromBookmark(long tweetId) {
+        User user = authService.getAuthenticatedUser();
+        Tweet tweet = tweetService.getTweet(tweetId);
+        user.getBookmarks().remove(tweet);
+        userRepository.save(user);
     }
+
+    @Override
+    public List<TweetDetailDto> getUserBookmarks(int offset) {
+        List<Tweet> bookmarkedTweets = tweetService.getTweetByUserLikes(offset);
+        return mapstructMapper.tweetsToTweetDetailsDto(bookmarkedTweets);
+    }
+
 
 
     private User updateUserPorfile(User user, UpdateProfileRequest updateProfileRequest) {
@@ -161,26 +135,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private Follower followUser(User user, User targetUser) {
-        targetUser.setFollowerCount(targetUser.getFollowerCount()+1);
-        user.setFollowingCount(user.getFollowingCount()+1);
-        userRepository.save(targetUser);
-        userRepository.save(user);
-        return followerRepository.save(new Follower(user.getUserId(), targetUser.getUserId()));
-    }
 
 
-    private Follower unfollowUser(User user, User targetUser) {
-        targetUser.setFollowerCount(targetUser.getFollowerCount()-1);
-        user.setFollowingCount(user.getFollowingCount()-1);
-        userRepository.save(targetUser);
-        userRepository.save(user);
-        return followerRepository.findRecord(user.getUserId(), targetUser.getUserId())
-                .map(follower -> {
-                    followerRepository.delete(follower);
-                    return follower;
-                })
-                .orElseThrow(RecordNotFoundException::new);
-    }
 
 }

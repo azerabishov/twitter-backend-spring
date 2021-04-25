@@ -1,5 +1,6 @@
 package org.azerabshv.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.config.EmailConfig;
 import org.azerabshv.models.Mail;
 import org.azerabshv.services.EmailService;
@@ -17,14 +18,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.azerabshv.constants.FileNameConstants.FORGOT_PASSWORD_EMAIL_TEMPLATE;
+
 @Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
 
-    private static final String EMAIL_TEMPLATE = "forgot-password-template";
-
-    @Autowired
-    JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     @Autowired
     private SpringTemplateEngine templateEngine;
@@ -62,6 +63,6 @@ public class EmailServiceImpl implements EmailService {
         mail.setFrom("abishov@gmail.com");
         mail.setSubject("Reset password");
         mail.setProps(map);
-        this.mailSender.send(this.buildMimeMessage(mail, EMAIL_TEMPLATE));
+        this.mailSender.send(this.buildMimeMessage(mail, FORGOT_PASSWORD_EMAIL_TEMPLATE));
     }
 }

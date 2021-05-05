@@ -6,7 +6,6 @@ import org.azerabshv.dto.request.LoginRequest;
 import org.azerabshv.dto.request.ResetPasswordRequest;
 import org.azerabshv.dto.request.SignupRequest;
 import org.azerabshv.services.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class AuthController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("signup")
-    public void registerUser(@RequestBody SignupRequest signupRequest) {
+    public void registerUser(@RequestBody SignupRequest signupRequest) throws MessagingException {
         authService.register(signupRequest);
     }
 
@@ -43,5 +42,11 @@ public class AuthController {
     @PostMapping("/reset/password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) throws MessagingException {
         return authService.resetPassword(resetPasswordRequest);
+    }
+
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam Integer verificationCode)  {
+        return authService.verifyEmail(verificationCode);
     }
 }

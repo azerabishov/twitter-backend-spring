@@ -5,10 +5,7 @@ import org.azerabshv.dto.request.LoginRequest;
 import org.azerabshv.dto.request.ResetPasswordRequest;
 import org.azerabshv.dto.request.SignupRequest;
 import org.azerabshv.dto.response.LoginResponse;
-import org.azerabshv.exception.EmailAlreadyExistsException;
-import org.azerabshv.exception.InvalidTokenException;
-import org.azerabshv.exception.UserNotFoundException;
-import org.azerabshv.exception.UsernameAlreadyExistsException;
+import org.azerabshv.exception.*;
 import org.azerabshv.models.User;
 import org.azerabshv.repository.user.UserRepository;
 import org.azerabshv.security.UserDetailsImpl;
@@ -44,13 +41,13 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public void register(SignupRequest signupRequest) {
+    public void register(SignupRequest signupRequest) throws MessagingException {
         userRepository.findByUsername(signupRequest.getUsername())
                 .ifPresent(user -> { throw new UsernameAlreadyExistsException(); });
         userRepository.findByEmail(signupRequest.getEmail())
                 .ifPresent(user -> { throw new EmailAlreadyExistsException(); });
-
         createUser(signupRequest);
+        sendEmailVerificationCode(signupRequest.getEmail());
     }
 
 
@@ -64,6 +61,10 @@ public class AuthServiceImpl implements AuthService {
 //        authentication.isAuthenticated()
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        if(!userPrincipal.getIsEmailVerified()) {
+            throw new EmailNotVerifiedException();
+        }
+
         String token = jwtUtils.generateToken(userPrincipal);
         return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(userPrincipal.getId(), userPrincipal.getEmail(), userPrincipal.getUsername(), token));
 
@@ -79,9 +80,19 @@ public class AuthServiceImpl implements AuthService {
                 .map(user -> updateUserForgotPasswordToken(user, token))
                 .orElseThrow(UserNotFoundException::new);
 
-        emailService.sendMail(token, email);
+        emailService.sendForgotPasswordMail(token, email);
     }
 
+
+
+    @Override
+    public ResponseEntity<?> verifyEmail(Integer verificationCode) {
+        userRepository.findByEmailVerificationCode(verificationCode)
+                .map(this::verifyUserEmail)
+                .orElseThrow(InvalidTokenException::new);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Your password has been reset");
+    }
 
 
     @Override
@@ -90,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
                 .map(user -> updateUserPassword(user, resetPasswordRequest.getPassword()))
                 .orElseThrow(InvalidTokenException::new);
 
-        return ResponseEntity.status(HttpStatus.OK).body("Your password has been reset");
+        return ResponseEntity.status(HttpStatus.OK).body("Success");
     }
 
     @Override
@@ -129,10 +140,36 @@ public class AuthServiceImpl implements AuthService {
         return userRepository.save(user);
     }
 
+    public User verifyUserEmail(User user) {
+        if(user.getEmailVerificationCodeExpireIn().before(new Date())){
+            throw new InvalidTokenException();
+        }
+
+        user.setEmailVerified(true);
+        return userRepository.save(user);
+    }
+
+    public void sendEmailVerificationCode(String email) throws MessagingException {
+        int verificationCode = (int) (Math.random()*(999999-100000)) - +100000;
+        userRepository.findByEmail(email)
+                .map(user -> updateEmailVerificationCode(user, verificationCode))
+                .orElseThrow(UserNotFoundException::new);
+
+        emailService.sendEmailVerificationMail(verificationCode, email);
+    }
+
+
+
 
     public User updateUserForgotPasswordToken(User user, String token) {
         user.setForgotPasswordToken(token);
         user.setForgotPasswordTokenCreatedAt(new Date(System.currentTimeMillis() + 1000*60*60*10));
+        return userRepository.save(user);
+    }
+
+    public User updateEmailVerificationCode(User user, Integer verificationCode) {
+        user.setEmailVerificationCode(verificationCode);
+        user.setEmailVerificationCodeExpireIn(new Date(System.currentTimeMillis() + 1000*60*60*10));
         return userRepository.save(user);
     }
 

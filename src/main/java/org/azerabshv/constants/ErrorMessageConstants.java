@@ -10,4 +10,5 @@ public class ErrorMessageConstants {
     public static final String RECORD_NOT_FOUND = "Record not found!";
     public static final String INVALID_TOKEN = "Token is invalid!";
     public static final String INVALID_USERNAME_OR_PASSWORD = "Username or password is invalid!";
+    public static final String EMAIL_NOT_VERIFIED = "Email not verified!";
 }

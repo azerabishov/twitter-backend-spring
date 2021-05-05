@@ -5,5 +5,6 @@ import org.azerabshv.models.Mail;
 import javax.mail.MessagingException;
 
 public interface EmailService {
-    void sendMail(String token, String userEmal) throws MessagingException;
+    void sendForgotPasswordMail(String token, String userEmail) throws MessagingException;
+    void sendEmailVerificationMail(Integer verificationCode, String userEmail) throws MessagingException;
 }

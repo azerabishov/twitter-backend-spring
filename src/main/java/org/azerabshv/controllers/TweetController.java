@@ -3,16 +3,9 @@ package org.azerabshv.controllers;
 import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserDetailDto;
-import org.azerabshv.repository.tweet.TweetRepository;
-import org.azerabshv.repository.user.UserRepository;
-import org.azerabshv.security.UserDetailsImpl;
-import org.azerabshv.services.FileService;
 import org.azerabshv.services.TweetService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

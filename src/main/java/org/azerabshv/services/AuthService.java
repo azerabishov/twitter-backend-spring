@@ -12,8 +12,10 @@ import javax.mail.MessagingException;
 public interface AuthService {
     User getAuthenticatedUser();
     Long getAuthenticatedUserId();
-    void register(SignupRequest signupRequest);
+    void register(SignupRequest signupRequest) throws MessagingException;
     ResponseEntity<LoginResponse> login(LoginRequest loginRequest);
     void sendForgotPasswordEmail(String email) throws MessagingException;
     ResponseEntity<?> resetPassword(ResetPasswordRequest resetPasswordRequest);
+    ResponseEntity<?> verifyEmail(Integer verificationCode);
+
 }

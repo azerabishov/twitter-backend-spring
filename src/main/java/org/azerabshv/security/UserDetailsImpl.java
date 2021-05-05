@@ -11,13 +11,15 @@ public class UserDetailsImpl implements UserDetails {
     private final String email;
     private final String username;
     private final String password;
+    private final Boolean isEmailVerified;
 
 
-    public UserDetailsImpl(long Id, String email, String username, String password){
+    public UserDetailsImpl(long Id, String email, String username, String password, boolean isEmailVerified){
         this.Id = Id;
         this.email = email;
         this.username = username;
         this.password = password;
+        this.isEmailVerified = isEmailVerified;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -25,7 +27,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getUserId(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getPassword()
+                user.getPassword(),
+                user.isEmailVerified()
         );
     }
 
@@ -44,6 +47,10 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
+    }
+
+    public boolean getIsEmailVerified() {
+        return this.isEmailVerified;
     }
 
     @Override

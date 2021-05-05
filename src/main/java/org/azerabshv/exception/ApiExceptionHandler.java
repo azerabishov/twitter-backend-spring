@@ -22,6 +22,11 @@ public class ApiExceptionHandler {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH-mm-ss");
 
 
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<?> handle(EmailNotVerifiedException ex, WebRequest request, Locale locale) {
+        return buildException(request, HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<?> handle(AlreadyExistsException ex, WebRequest request, Locale locale) {
         return buildException(request, HttpStatus.CONFLICT, ex.getMessage());

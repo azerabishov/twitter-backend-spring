@@ -1,5 +1,8 @@
 package org.azerabshv.models;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -7,6 +10,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@Data
+@RequiredArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +24,9 @@ public class User {
     private String email;
     @Column(name = "phone_number")
     private String phoneNumber;
+
+
+
     private String password;
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -65,6 +73,12 @@ public class User {
     private String forgotPasswordToken;
     @Column(name = "forgot_password_token_created_at")
     private Date forgotPasswordTokenCreatedAt ;
+    @Column(name = "is_email_verified", columnDefinition = "boolean not null default false")
+    private boolean isEmailVerified;
+    @Column(name = "email_verification_code")
+    private Integer emailVerificationCode;
+    @Column(name = "email_verification_code_created_at")
+    private Date emailVerificationCodeExpireIn ;
     @Temporal(TemporalType.DATE)
     private Date birthdate;
     @Column(name = "created_at", columnDefinition = "TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP")
@@ -72,9 +86,7 @@ public class User {
 
 
 
-    public User() {
 
-    }
 
     public User(String username, String screenName, String email, String phoneNumber, Date birthdate, String password, Date createdAt) {
         this.username = username;
@@ -86,199 +98,6 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public User(String username,  String email, String phoneNumber, String password, String avatarUrl, String screenName, String profileBackgroundImageUrl, int followerCount, int friendCount, boolean isProtected, String bio, String location, String website, Date birthdate, Timestamp createdAt, String forgotPasswordToken, Timestamp forgotPasswordTokenCreatedAt) {
-        this.username = username;
-        this.screenName = screenName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
-        this.avatarUrl = avatarUrl;
-        this.profileBackgroundImageUrl = profileBackgroundImageUrl;
-        this.followerCount = followerCount;
-        this.friendCount = friendCount;
-        this.isProtected = isProtected;
-        this.bio = bio;
-        this.location = location;
-        this.website = website;
-        this.forgotPasswordToken = forgotPasswordToken;
-        this.forgotPasswordTokenCreatedAt = forgotPasswordTokenCreatedAt;
-        this.birthdate = birthdate;
-        this.createdAt = createdAt;
-    }
 
-    public long getUserId() {
-        return userId;
-    }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getScreenName() {
-        return screenName;
-    }
-
-    public void setScreenName(String screenName) {
-        this.screenName = screenName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getProfileBackgroundImageUrl() {
-        return profileBackgroundImageUrl;
-    }
-
-    public void setProfileBackgroundImageUrl(String profileBackgroundImageUrl) {
-        this.profileBackgroundImageUrl = profileBackgroundImageUrl;
-    }
-
-    public int getFollowerCount() {
-        return followerCount;
-    }
-
-    public void setFollowerCount(int followerCount) {
-        this.followerCount = followerCount;
-    }
-
-    public int getFriendCount() {
-        return friendCount;
-    }
-
-    public void setFriendCount(int friendCount) {
-        this.friendCount = friendCount;
-    }
-
-    public boolean isProtected() {
-        return isProtected;
-    }
-
-    public void setProtected(boolean aProtected) {
-        isProtected = aProtected;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public List<Tweet> getTweets() {
-        return tweets;
-    }
-
-    public void setTweets(List<Tweet> tweets) {
-        this.tweets = tweets;
-    }
-
-    public List<Tweet> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setBookmarks(List<Tweet> bookmarks) {
-        this.bookmarks = bookmarks;
-    }
-
-    public List<Tweet> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Tweet> likes) {
-        this.likes = likes;
-    }
-
-    public List<Tweet> getRetweets() {
-        return retweets;
-    }
-
-    public void setRetweets(List<Tweet> retweets) {
-        this.retweets = retweets;
-    }
-
-    public String getForgotPasswordToken() {
-        return forgotPasswordToken;
-    }
-
-    public void setForgotPasswordToken(String forgotPasswordToken) {
-        this.forgotPasswordToken = forgotPasswordToken;
-    }
-
-    public Date getForgotPasswordTokenCreatedAt() {
-        return forgotPasswordTokenCreatedAt;
-    }
-
-    public void setForgotPasswordTokenCreatedAt(Date forgotPasswordTokenCreatedAt) {
-        this.forgotPasswordTokenCreatedAt = forgotPasswordTokenCreatedAt;
-    }
-
-    public Date getBirthdate() {
-        return birthdate;
-    }
-
-    public void setBirthdate(Date birthdate) {
-        this.birthdate = birthdate;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
 }

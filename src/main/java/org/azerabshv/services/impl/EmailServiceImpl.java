@@ -49,19 +49,29 @@ public class EmailServiceImpl implements EmailService {
     private String getHtmlContent(Mail mail, String emailTemplate) {
         Context context = new Context();
         context.setVariables(mail.getProps());
-        String html = this.templateEngine.process(emailTemplate, context);
-
-        return html;
+        return this.templateEngine.process(emailTemplate, context);
     }
 
     @Override
-    public void sendMail(String token, String userEmail) throws MessagingException {
+    public void sendForgotPasswordMail(String token, String userEmail) throws MessagingException {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("token",token);
         Mail mail = new Mail();
         mail.setMailTo(userEmail);
         mail.setFrom("abishov@gmail.com");
         mail.setSubject("Reset password");
+        mail.setProps(map);
+        this.mailSender.send(this.buildMimeMessage(mail, FORGOT_PASSWORD_EMAIL_TEMPLATE));
+    }
+
+    @Override
+    public void sendEmailVerificationMail(Integer verificationCode, String userEmail) throws MessagingException {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("token",verificationCode);
+        Mail mail = new Mail();
+        mail.setMailTo(userEmail);
+        mail.setFrom("abishov@gmail.com");
+        mail.setSubject("Verify email");
         mail.setProps(map);
         this.mailSender.send(this.buildMimeMessage(mail, FORGOT_PASSWORD_EMAIL_TEMPLATE));
     }

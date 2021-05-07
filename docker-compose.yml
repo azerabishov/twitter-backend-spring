@@ -1,0 +1,24 @@
+version: "3.7"
+services:
+  mysql-service:
+    image: mysql:8.0
+    networks:
+      - app-network
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=azer2937
+      - MYSQL_DATABASE=twitter
+  twitter-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+    depends_on:
+      - mysql-service
+
+networks:
+  app-network:
+    driver: bridge

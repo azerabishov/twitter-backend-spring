@@ -2,7 +2,7 @@
 Twitter clone that covers the core features of twitter
 
 
-##Usage
+## Usage
 1. Clone the repo or download it.
     ```
    git clone https://github.com/fabiodelabruna/instagram-clone.git

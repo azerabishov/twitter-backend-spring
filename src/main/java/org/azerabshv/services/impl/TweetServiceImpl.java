@@ -2,6 +2,7 @@ package org.azerabshv.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.azerabshv.dto.response.MessageResponse;
+import org.azerabshv.dto.response.SearchResponse;
 import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserDetailDto;
 import org.azerabshv.enums.TweetTypeEnum;
@@ -157,6 +158,18 @@ public class TweetServiceImpl implements TweetService {
         List<Long> friendsIds = followService.getFriendsIds();
         List<Tweet> tweets = tweetRepository.getAllByUserIds(friendsIds);
         return mapstructMapper.tweetsToTweetDetailsDto(tweets);
+    }
+
+    @Override
+    public SearchResponse search(String searchKey) {
+        List<Tweet> tweets = tweetRepository.findTweetByContent(searchKey);
+        List<User> users = userRepository.findUserByContent(searchKey);
+        List<TweetDetailDto> tweetDetails = mapstructMapper.tweetsToTweetDetailsDto(tweets);
+        List<UserDetailDto> userProfiles = mapstructMapper.usersToUserDetailsDto(users);
+        return SearchResponse.builder()
+                .userProfiles(userProfiles)
+                .tweets(tweetDetails)
+                .build();
     }
 
     @Override

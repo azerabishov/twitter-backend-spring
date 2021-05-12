@@ -1,5 +1,6 @@
 package org.azerabshv.services;
 
+import org.azerabshv.dto.response.SearchResponse;
 import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserDetailDto;
 import org.azerabshv.models.Tweet;
@@ -24,6 +25,7 @@ public interface TweetService {
     void undoLike(long tweetId);
     void quoteTweet(long tweetId, MultipartFile contentFile, String content);
     List<TweetDetailDto> getTweetsByUserPreference();
+    SearchResponse search(String searchKey);
     List<Tweet> getTweetByUser(int offset);
     List<Tweet> getTweetByUserLikes(int offset);
     List<Tweet> getTweetWithMedia(int offset);

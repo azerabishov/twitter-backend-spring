@@ -52,6 +52,12 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public void deleteTweet(Long tweetId) {
+        Tweet tweet = getTweet(tweetId);
+        tweetRepository.delete(tweet);
+    }
+
+    @Override
     public TweetDetailDto getTweetDetail(long tweetId) {
         return tweetRepository.findById(tweetId)
                 .map(mapstructMapper::tweetToTweetDetailDto)
@@ -76,16 +82,14 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public List<UserDetailDto> getTweetLikes(long tweetId) {
-        Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(RecordNotFoundException::new);
+        Tweet tweet = getTweet(tweetId);
         List<User> likedUsers = tweet.getLikedUsers();
         return mapstructMapper.usersToUserDetailsDto(likedUsers);
      }
 
     @Override
     public List<UserDetailDto> getTweetRetweets(long tweetId) {
-        Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(RecordNotFoundException::new);
+        Tweet tweet = getTweet(tweetId);
         List<User> retweetedUsers = tweet.getRetweetedUsers();
         return mapstructMapper.usersToUserDetailsDto(retweetedUsers);
     }
@@ -94,47 +98,53 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public void replyTweet(long tweetId, MultipartFile contentFile, String content) {
-        Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(RecordNotFoundException::new);
+        Tweet tweet = getTweet(tweetId);
         User user = authService.getAuthenticatedUser();
-
         String filename = fileService.save(contentFile);
-
-
         tweet.setReplyCount(tweet.getReplyCount()+1);
         Tweet replyTweet = new Tweet( filename, content, new Date(), user, tweetId, null );
         tweetRepository.save(replyTweet);
     }
 
     @Override
-    public ResponseEntity<?> retweetTweet(long tweetId) {
-        Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(RecordNotFoundException::new);
+    public void retweetTweet(long tweetId) {
+        Tweet tweet = getTweet(tweetId);
         User user = authService.getAuthenticatedUser();
         tweet.setRetweetCount(tweet.getRetweetCount()+1);
         user.getRetweets().add(tweet);
         userRepository.save(user);
         tweetRepository.save(tweet);
-        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Success!"));
-
     }
 
     @Override
-    public ResponseEntity<?> likeTweet(long tweetId) {
-        Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(RecordNotFoundException::new);
+    public void undoRetweet(long tweetId) {
+        User user = authService.getAuthenticatedUser();
+        Tweet tweet = getTweet(tweetId);
+        user.getRetweets().remove(tweet);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void likeTweet(long tweetId) {
+        Tweet tweet = getTweet(tweetId);
         User user = authService.getAuthenticatedUser();
         tweet.setLikeCount(tweet.getLikeCount()+1);
         user.getLikes().add(tweet);
         userRepository.save(user);
         tweetRepository.save(tweet);
-        return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Success!"));
+    }
+
+    @Override
+    public void undoLike(long tweetId) {
+        User user = authService.getAuthenticatedUser();
+        Tweet tweet = getTweet(tweetId);
+        user.getLikes().remove(tweet);
+        userRepository.save(user);
     }
 
     @Override
     public void quoteTweet(long tweetId, MultipartFile contentFile, String content) {
-        Tweet tweet = tweetRepository.findById(tweetId)
-                .orElseThrow(RecordNotFoundException::new);
+        Tweet tweet = getTweet(tweetId);
         User user = authService.getAuthenticatedUser();
         String filename = fileService.save(contentFile);
         tweet.setQuoteCount(tweet.getQuoteCount()+1);

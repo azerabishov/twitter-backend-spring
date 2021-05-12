@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
-    @Query(value = "select * from follows where followers.follower_id = :followerId and followers.following_id = :followingId", nativeQuery = true)
+    @Query(value = "select * from follows where follows.follower_id = :followerId and follows.following_id = :followingId", nativeQuery = true)
     Optional<Follow> findRecord(long followerId, long followingId);
 
 //    @Query(value="select users.avatar_url, users.username, users.screen_name, users.bio from followers  left join users on users.user_id = followers.follower_id where followers.follower_id = :followerId", nativeQuery=true)

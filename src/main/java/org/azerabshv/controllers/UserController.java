@@ -32,23 +32,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("profile/update")
-    public void updateProfile(
-            @RequestParam(value = "avatarUrl", required = false) MultipartFile avatarUrl,
-            @RequestParam(value = "profileBackgroundImageUrl", required = false) MultipartFile profileBackgroundImageUrl,
-            @RequestParam(value = "screenName", required = false) String screenName,
-            @RequestParam(value = "bio", required = false) String bio,
-            @RequestParam(value = "location", required = false) String location,
-            @RequestParam(value = "website", required = false) String website
-    ) throws ParseException {
-        UpdateProfileRequest updateProfileRequest = UpdateProfileRequest.builder()
-                .avatarUrl(avatarUrl)
-                .profileBackgroundImageUrl(profileBackgroundImageUrl)
-                .screenName(screenName)
-                .bio(bio)
-                .location(location)
-                .website(website)
-                .build();
-
+    public void updateProfile(@ModelAttribute UpdateProfileRequest updateProfileRequest) throws ParseException {
         userService.updateUserProfile(updateProfileRequest);
     }
 
@@ -116,10 +100,16 @@ public class UserController {
         return userService.getTweetsWithMedia(offset);
     }
 
-    @GetMapping("bookmark/:id")
+    @GetMapping("bookmark/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addTweetToBookmark(@PathVariable Long tweetId){
+    public void addTweetToBookmark(@PathVariable("id") Long tweetId){
         userService.addTweetToBookmark(tweetId);
+    }
+
+    @DeleteMapping("bookmark/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeTweetFromBookmark(@PathVariable("id") Long tweetId){
+        userService.removeTweetFromBookmark(tweetId);
     }
 
     @GetMapping("bookmarks")
@@ -134,11 +124,7 @@ public class UserController {
         return userService.getUserBookmarks(offset);
     }
 
-    @DeleteMapping("bookmark/:id")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeTweetFromBookmark(@PathVariable Long tweetId){
-        userService.removeTweetFromBookmark(tweetId);
-    }
+
 
 
 }

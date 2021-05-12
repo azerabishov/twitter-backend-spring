@@ -9,9 +9,11 @@ import org.azerabshv.dto.response.UserProfileDto;
 import org.azerabshv.services.FollowService;
 import org.azerabshv.services.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Min;
 import java.text.ParseException;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -26,7 +29,7 @@ public class UserController {
     private final FollowService followService;
 
     @GetMapping("profile/{id}")
-    public UserProfileDto getProfile(@PathVariable Long userId){
+    public UserProfileDto getProfile(@PathVariable("id") Long userId){
         return userService.getUserProfile(userId);
     }
 
@@ -54,8 +57,6 @@ public class UserController {
         userService.updateUserPassword(passwordRequest);
     }
 
-
-
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("follow/{id}")
     public void followUser(@PathVariable("id") long targetUserId){
@@ -80,36 +81,21 @@ public class UserController {
     }
 
     @GetMapping("tweets")
-    public List<TweetDetailDto> getTweets(@RequestParam int page){
-        int offset;
-        if(page > 0) {
-            offset = (page-1)*10;
-        }else{
-            offset = 1;
-        }
+    public List<TweetDetailDto> getTweets(@RequestParam("page")  @Min(1) int page){
+        int offset = (page-1)*10;
         return userService.getAllTweets(offset);
     }
 
     @GetMapping("likes")
-    public List<TweetDetailDto> getLikes(@RequestParam int page){
-        int offset;
-        if(page > 0) {
-            offset = (page-1)*10;
-        }else{
-            offset = 1;
-        }
+    public List<TweetDetailDto> getLikes(@RequestParam("page") @Min(1) int page){
+        int offset = (page-1)*10;
         return userService.getLikedTweets(offset);
     }
 
 
     @GetMapping("medias")
-    public List<TweetDetailDto> getMedias(@RequestParam int page){
-        int offset;
-        if(page > 0) {
-            offset = (page-1)*10;
-        }else{
-            offset = 1;
-        }
+    public List<TweetDetailDto> getMedias(@RequestParam("page") @Min(1) int page){
+        int offset = (page-1)*10;
         return userService.getTweetsWithMedia(offset);
     }
 
@@ -127,13 +113,8 @@ public class UserController {
 
     @GetMapping("bookmarks")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<TweetDetailDto> getBookMarks(@RequestParam int page){
-        int offset;
-        if(page > 0) {
-            offset = (page-1)*10;
-        }else{
-            offset = 1;
-        }
+    public List<TweetDetailDto> getBookMarks(@RequestParam("page") @Min(1) int page){
+        int offset = (page-1)*10;
         return userService.getUserBookmarks(offset);
     }
 

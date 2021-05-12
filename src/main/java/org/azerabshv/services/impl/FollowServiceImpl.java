@@ -27,7 +27,6 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public List<UserDetailDto> getFriendsList() {
         long userId = authService.getAuthenticatedUserId();
-        System.out.println(userId);
         return followRepository.findAllFriends(userId);
     }
 
@@ -42,7 +41,6 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public List<UserDetailDto> getFollowerList() {
         long userId = authService.getAuthenticatedUserId();
-        System.out.println(userId);
         return followRepository.findAllFollowers(userId);
     }
 

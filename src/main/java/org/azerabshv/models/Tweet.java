@@ -1,5 +1,7 @@
 package org.azerabshv.models;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.azerabshv.enums.TweetTypeEnum;
 
 import javax.persistence.*;
@@ -8,6 +10,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "tweets")
+@Data
+@RequiredArgsConstructor
 public class Tweet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,9 +50,6 @@ public class Tweet {
     @ManyToMany(targetEntity = User.class, mappedBy = "retweets", cascade = CascadeType.ALL)
     private List<User> retweetedUsers;
 
-    public Tweet() {
-    }
-
     public Tweet(String mediaUrl, String content, Date createdAt, User user) {
         this.mediaUrl = mediaUrl;
         this.content = content;
@@ -67,142 +68,5 @@ public class Tweet {
         if (quoteTo != null) {
             this.quoteTo = quoteTo;
         }
-    }
-
-    public Tweet(String mediaUrl, String content, TweetTypeEnum tweetType, int replyCount, long replyTo, int likeCount, int retweetCount, int quoteCount, Date createdAt, User user, List<User> users, List<User> likedUsers, List<User> retweetedUsers, Long quoteTo) {
-        this.mediaUrl = mediaUrl;
-        this.content = content;
-        this.tweetType = tweetType;
-        this.replyCount = replyCount;
-        this.replyTo = replyTo;
-        this.likeCount = likeCount;
-        this.retweetCount = retweetCount;
-        this.quoteCount = quoteCount;
-        this.createdAt = createdAt;
-        this.user = user;
-        this.users = users;
-        this.likedUsers = likedUsers;
-        this.retweetedUsers = retweetedUsers;
-        this.quoteTo = quoteTo;
-    }
-
-    public long getTweetId() {
-        return tweetId;
-    }
-
-    public void setTweetId(long tweetId) {
-        this.tweetId = tweetId;
-    }
-
-    public String getMediaUrl() {
-        return mediaUrl;
-    }
-
-    public void setMediaUrl(String mediaUrl) {
-        this.mediaUrl = mediaUrl;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public TweetTypeEnum getTweetType() {
-        return tweetType;
-    }
-
-    public void setTweetType(TweetTypeEnum tweetType) {
-        this.tweetType = tweetType;
-    }
-
-    public int getReplyCount() {
-        return replyCount;
-    }
-
-    public void setReplyCount(int replyCount) {
-        this.replyCount = replyCount;
-    }
-
-    public Long getReplyTo() {
-        return replyTo;
-    }
-
-    public void setReplyTo(Long replyTo) {
-        this.replyTo = replyTo;
-    }
-
-    public long getQuoteTo() {
-        return quoteTo;
-    }
-
-    public void setQuoteTo(long quoteTo) {
-        this.quoteTo = quoteTo;
-    }
-
-    public int getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(int likeCount) {
-        this.likeCount = likeCount;
-    }
-
-    public int getRetweetCount() {
-        return retweetCount;
-    }
-
-    public void setRetweetCount(int retweetCount) {
-        this.retweetCount = retweetCount;
-    }
-
-    public int getQuoteCount() {
-        return quoteCount;
-    }
-
-    public void setQuoteCount(int quoteCount) {
-        this.quoteCount = quoteCount;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public List<User> getLikedUsers() {
-        return likedUsers;
-    }
-
-    public void setLikedUsers(List<User> likedUsers) {
-        this.likedUsers = likedUsers;
-    }
-
-    public List<User> getRetweetedUsers() {
-        return retweetedUsers;
-    }
-
-    public void setRetweetedUsers(List<User> retweetedUsers) {
-        this.retweetedUsers = retweetedUsers;
     }
 }

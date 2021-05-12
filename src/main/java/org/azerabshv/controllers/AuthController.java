@@ -1,7 +1,6 @@
 package org.azerabshv.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.azerabshv.dto.request.ForgotPasswordRequest;
 import org.azerabshv.dto.request.LoginRequest;
 import org.azerabshv.dto.request.ResetPasswordRequest;
 import org.azerabshv.dto.request.SignupRequest;
@@ -34,8 +33,8 @@ public class AuthController {
 
 
     @PostMapping("/forgot/password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws MessagingException {
-        authService.sendForgotPasswordEmail(forgotPasswordRequest.getEmail());
+    public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) throws MessagingException {
+        authService.sendForgotPasswordEmail(email);
         return ResponseEntity.status(HttpStatus.OK).body("Please check your email");
     }
 

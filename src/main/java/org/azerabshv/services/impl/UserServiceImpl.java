@@ -6,19 +6,19 @@ import org.azerabshv.dto.request.UpdateProfileRequest;
 import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserProfileDto;
 import org.azerabshv.exception.InvalidUsernameOrPasswordException;
+import org.azerabshv.exception.NotAllowedException;
 import org.azerabshv.exception.UserNotFoundException;
 import org.azerabshv.mappers.MapStructMapper;
+import org.azerabshv.models.Follow;
 import org.azerabshv.models.Tweet;
 import org.azerabshv.models.User;
 import org.azerabshv.repository.user.UserRepository;
-import org.azerabshv.services.AuthService;
-import org.azerabshv.services.FileService;
-import org.azerabshv.services.TweetService;
-import org.azerabshv.services.UserService;
+import org.azerabshv.services.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -32,6 +32,8 @@ public class UserServiceImpl implements UserService {
 
     private final TweetService tweetService;
 
+    private final FollowService followService;
+
     private final PasswordEncoder encoder;
 
     private final MapStructMapper mapstructMapper;
@@ -39,9 +41,10 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserProfileDto getUserProfile() {
-        long userId = authService.getAuthenticatedUserId();
+    public UserProfileDto getUserProfile(Long userId) {
+        User authenticatedUser = authService.getAuthenticatedUser();
         return userRepository.findById(userId)
+                .map(user -> checkUserAllowedToSeeTweet(user, authenticatedUser))
                 .map(mapstructMapper::userToUserProfileDto)
                 .orElseThrow(UserNotFoundException::new);
     }
@@ -52,6 +55,20 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userId)
                 .map(user -> updateUserPorfile(user, updateProfileRequest))
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public void lockProfile() {
+        User user = authService.getAuthenticatedUser();
+        user.setProtected(true);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void unlockProfile() {
+        User user = authService.getAuthenticatedUser();
+        user.setProtected(false);
+        userRepository.save(user);
     }
 
     @Override
@@ -133,6 +150,18 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new InvalidUsernameOrPasswordException();
         }
+    }
+
+
+    private User checkUserAllowedToSeeTweet(User user, User authenticatedUser) {
+        if(user.isProtected()) {
+            followService.checkRecordExist(user.getUserId(), authenticatedUser.getUserId())
+                    .orElseThrow(NotAllowedException::new);
+            return user;
+        } else{
+            return user;
+        }
+
     }
 
 

@@ -13,6 +13,7 @@ import org.azerabshv.services.FollowService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +73,11 @@ public class FollowServiceImpl implements FollowService {
         userRepository.findById(userId)
                 .map(user -> unfollowUser(user, targetUser))
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
+    public Optional<Follow> checkRecordExist(long followerId, long followingId) {
+        return followRepository.findRecord(followerId, followingId);
     }
 
 

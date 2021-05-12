@@ -11,4 +11,5 @@ public class ErrorMessageConstants {
     public static final String INVALID_TOKEN = "Token is invalid!";
     public static final String INVALID_USERNAME_OR_PASSWORD = "Username or password is invalid!";
     public static final String EMAIL_NOT_VERIFIED = "Email not verified!";
+    public static final String RESOURCE_ACCESS_FORBIDDEN = "Accesing this resource is not allowed!";
 }

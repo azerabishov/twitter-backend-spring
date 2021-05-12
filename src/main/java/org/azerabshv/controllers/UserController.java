@@ -25,9 +25,9 @@ public class UserController {
 
     private final FollowService followService;
 
-    @GetMapping("profile")
-    public UserProfileDto getProfile(){
-        return userService.getUserProfile();
+    @GetMapping("profile/{id}")
+    public UserProfileDto getProfile(@PathVariable Long userId){
+        return userService.getUserProfile(userId);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -37,10 +37,23 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/profile/lock")
+    public void lockProfile() {
+        userService.lockProfile();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/profile/unlock")
+    public void unlockProfile() {
+        userService.unlockProfile();
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("password/update")
     public void updateProfile(@RequestBody UpdatePasswordRequest passwordRequest){
         userService.updateUserPassword(passwordRequest);
     }
+
 
 
     @ResponseStatus(HttpStatus.OK)
@@ -123,6 +136,7 @@ public class UserController {
         }
         return userService.getUserBookmarks(offset);
     }
+
 
 
 

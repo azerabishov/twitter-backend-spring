@@ -38,6 +38,10 @@ public class ApiExceptionHandler {
         return buildException(request, HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(NotAllowedException.class)
+    public ResponseEntity<?> handle(NotAllowedException ex, WebRequest request, Locale locale) {
+        return buildException(request, HttpStatus.FORBIDDEN, ex.getMessage());
+    }
 
     @ExceptionHandler(InvalidStateException.class)
     public ResponseEntity<?> handle(InvalidStateException ex, WebRequest request, Locale locale) {

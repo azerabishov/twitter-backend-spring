@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface UserService {
-    UserProfileDto getUserProfile();
+    UserProfileDto getUserProfile(Long userId);
     void updateUserProfile(UpdateProfileRequest updateProfileRequest);
+    void lockProfile();
+    void unlockProfile();
     void updateUserPassword(UpdatePasswordRequest passwordRequest);
     List<TweetDetailDto> getAllTweets(int page);
     List<TweetDetailDto> getLikedTweets(int offset);

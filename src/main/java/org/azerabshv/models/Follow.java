@@ -18,4 +18,9 @@ public class Follow {
     private long followerId;
     @Column(name = "following_id")
     private long followingId;
+
+    public Follow(long followerId, long followingId) {
+        this.followerId = followerId;
+        this.followingId = followingId;
+    }
 }

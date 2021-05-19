@@ -1,5 +1,6 @@
 package org.azerabshv.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +42,7 @@ public class User {
     private String bio;
     private String location;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Tweet> tweets;
     @ManyToMany(targetEntity = Tweet.class,  cascade = CascadeType.ALL)
     @JoinTable(name = "bookmarks",

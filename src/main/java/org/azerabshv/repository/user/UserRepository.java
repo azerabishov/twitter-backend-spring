@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
-    @Query(value = "select * from users like '%searchKey%'", nativeQuery = true)
+    @Query("SELECT u FROM User u WHERE u.screenName LIKE CONCAT('%',:searchKey,'%') OR u.username LIKE CONCAT('%',:searchKey,'%')")
     List<User> findUserByContent(String searchKey);
 
     Optional<User> findByUsername(String username);

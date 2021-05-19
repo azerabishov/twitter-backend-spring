@@ -15,10 +15,10 @@ public interface UserService {
     void lockProfile();
     void unlockProfile();
     void updateUserPassword(UpdatePasswordRequest passwordRequest);
-    List<TweetDetailDto> getAllTweets(int page);
-    List<TweetDetailDto> getLikedTweets(int offset);
-    List<TweetDetailDto> getTweetsWithMedia(int offset);
+    List<TweetDetailDto> getAllTweets();
+    List<TweetDetailDto> getLikedTweets();
+    List<TweetDetailDto> getTweetsWithMedia();
     void addTweetToBookmark( long tweetId);
     void removeTweetFromBookmark( long tweetId);
-    List<TweetDetailDto> getUserBookmarks(int offset);
+    List<TweetDetailDto> getUserBookmarks();
 }

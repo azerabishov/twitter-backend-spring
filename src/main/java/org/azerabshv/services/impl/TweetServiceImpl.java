@@ -1,7 +1,6 @@
 package org.azerabshv.services.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.azerabshv.dto.response.MessageResponse;
 import org.azerabshv.dto.response.SearchResponse;
 import org.azerabshv.dto.response.TweetDetailDto;
 import org.azerabshv.dto.response.UserDetailDto;
@@ -15,8 +14,6 @@ import org.azerabshv.repository.user.UserRepository;
 import org.azerabshv.services.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,16 +63,14 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public List<TweetDetailDto> getTweetReplies(long tweetId, int pageNo) {
-        Pageable paging = PageRequest.of(pageNo, 20);
-        List<Tweet> tweets = tweetRepository.findByReplyTo(tweetId, paging);
+    public List<TweetDetailDto> getTweetReplies(long tweetId) {
+        List<Tweet> tweets = tweetRepository.findByReplyTo(tweetId);
         return mapstructMapper.tweetsToTweetDetailsDto(tweets);
     }
 
     @Override
-    public List<TweetDetailDto> getTweetQuotes(long tweetId, int pageNo) {
-        Pageable paging = PageRequest.of(pageNo, 20);
-        List<Tweet> tweets = tweetRepository.findByQuoteTo(tweetId, paging);
+    public List<TweetDetailDto> getTweetQuotes(long tweetId) {
+        List<Tweet> tweets = tweetRepository.findByQuoteTo(tweetId);
         return mapstructMapper.tweetsToTweetDetailsDto(tweets);
 
     }
@@ -173,26 +168,26 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
-    public List<Tweet> getTweetByUser(int offset) {
-        long userId = authService.getAuthenticatedUserId();
-        return tweetRepository.findByUser(userId, 20, offset);
+    public List<Tweet> getTweetByUser() {
+        User user = authService.getAuthenticatedUser();
+        return user.getTweets();
     }
 
     @Override
-    public List<Tweet> getTweetByUserLikes(int offset) {
-        long userId = authService.getAuthenticatedUserId();
-        return tweetRepository.findTweetsByUserLikes(userId, 20, offset);
+    public List<Tweet> getTweetByUserLikes() {
+        User user = authService.getAuthenticatedUser();
+        return user.getLikes();
     }
 
     @Override
-    public List<Tweet> getTweetWithMedia(int offset) {
+    public List<Tweet> getTweetWithMedia() {
         long userId = authService.getAuthenticatedUserId();
-        return tweetRepository.findUserTweetByType(userId, 20, offset, TweetTypeEnum.TWEET_WITH_MEDIA.toString());
+        return tweetRepository.findUserTweetByType(userId, TweetTypeEnum.TWEET_WITH_MEDIA.toString());
     }
 
     @Override
-    public List<Tweet> getTweetFromBookmarks(int offset) {
-        long userId = authService.getAuthenticatedUserId();
-        return tweetRepository.findTweetsFromBookmarks(userId, 20, offset);
+    public List<Tweet> getTweetFromBookmarks() {
+        User user = authService.getAuthenticatedUser();
+        return user.getBookmarks();
     }
 }

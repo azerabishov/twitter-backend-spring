@@ -35,8 +35,8 @@ public class TweetController {
     }
 
     @GetMapping("/{id}/replies")
-    public List<TweetDetailDto> getTweetResponses(@PathVariable("id") Long tweetId, @RequestParam int page){
-        return tweetService.getTweetReplies(tweetId, page);
+    public List<TweetDetailDto> getTweetResponses(@PathVariable("id") Long tweetId){
+        return tweetService.getTweetReplies(tweetId);
     }
 
     @GetMapping("/{id}/likes")
@@ -50,8 +50,8 @@ public class TweetController {
     }
 
     @GetMapping("/{id}/quotes")
-    public List<TweetDetailDto> getQuotes(@PathVariable("id") Long tweetId, @RequestParam int page){
-        return tweetService.getTweetQuotes(tweetId, page);
+    public List<TweetDetailDto> getQuotes(@PathVariable("id") Long tweetId){
+        return tweetService.getTweetQuotes(tweetId);
     }
 
     @ResponseStatus(HttpStatus.CREATED)

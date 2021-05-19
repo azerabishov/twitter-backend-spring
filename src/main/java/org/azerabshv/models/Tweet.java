@@ -1,5 +1,6 @@
 package org.azerabshv.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.azerabshv.enums.TweetTypeEnum;
@@ -19,6 +20,7 @@ public class Tweet {
     private long tweetId;
     @Column(name = "media_url")
     private String mediaUrl;
+    @Column(name = "content")
     private String content;
     @Enumerated(EnumType.STRING)
     private TweetTypeEnum tweetType;

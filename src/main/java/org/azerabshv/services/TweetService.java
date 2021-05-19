@@ -14,8 +14,8 @@ public interface TweetService {
     void createTweet(MultipartFile contentFile, String content);
     void deleteTweet(Long tweetId);
     TweetDetailDto getTweetDetail(long tweetId);
-    List<TweetDetailDto> getTweetReplies(long tweetId, int pageNo);
-    List<TweetDetailDto> getTweetQuotes(long tweetId, int pageNo);
+    List<TweetDetailDto> getTweetReplies(long tweetId);
+    List<TweetDetailDto> getTweetQuotes(long tweetId);
     List<UserDetailDto> getTweetLikes(long tweetId);
     List<UserDetailDto> getTweetRetweets(long tweetId);
     void replyTweet(long tweetId, MultipartFile contentFile, String content);
@@ -26,8 +26,8 @@ public interface TweetService {
     void quoteTweet(long tweetId, MultipartFile contentFile, String content);
     List<TweetDetailDto> getTweetsByUserPreference();
     SearchResponse search(String searchKey);
-    List<Tweet> getTweetByUser(int offset);
-    List<Tweet> getTweetByUserLikes(int offset);
-    List<Tweet> getTweetWithMedia(int offset);
-    List<Tweet> getTweetFromBookmarks(int offset);
+    List<Tweet> getTweetByUser();
+    List<Tweet> getTweetByUserLikes();
+    List<Tweet> getTweetWithMedia();
+    List<Tweet> getTweetFromBookmarks();
 }

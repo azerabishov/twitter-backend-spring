@@ -6,7 +6,7 @@ services:
       - app-network
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=azer2937
+      - MYSQL_ROOT_PASSWORD=your-mysql-password
       - MYSQL_DATABASE=twitter
   twitter-service:
     build:

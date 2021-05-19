@@ -81,22 +81,19 @@ public class UserController {
     }
 
     @GetMapping("tweets")
-    public List<TweetDetailDto> getTweets(@RequestParam("page")  @Min(1) int page){
-        int offset = (page-1)*10;
-        return userService.getAllTweets(offset);
+    public List<TweetDetailDto> getTweets(){
+        return userService.getAllTweets();
     }
 
     @GetMapping("likes")
-    public List<TweetDetailDto> getLikes(@RequestParam("page") @Min(1) int page){
-        int offset = (page-1)*10;
-        return userService.getLikedTweets(offset);
+    public List<TweetDetailDto> getLikes(){
+        return userService.getLikedTweets();
     }
 
 
     @GetMapping("medias")
-    public List<TweetDetailDto> getMedias(@RequestParam("page") @Min(1) int page){
-        int offset = (page-1)*10;
-        return userService.getTweetsWithMedia(offset);
+    public List<TweetDetailDto> getMedias(){
+        return userService.getTweetsWithMedia();
     }
 
     @GetMapping("bookmark/{id}")
@@ -113,9 +110,8 @@ public class UserController {
 
     @GetMapping("bookmarks")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<TweetDetailDto> getBookMarks(@RequestParam("page") @Min(1) int page){
-        int offset = (page-1)*10;
-        return userService.getUserBookmarks(offset);
+    public List<TweetDetailDto> getBookMarks(){
+        return userService.getUserBookmarks();
     }
 
 

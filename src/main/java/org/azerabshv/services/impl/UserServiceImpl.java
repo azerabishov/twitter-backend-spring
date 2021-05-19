@@ -79,22 +79,21 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-
     @Override
-    public List<TweetDetailDto> getAllTweets(int offset) {
-        List<Tweet> tweets = tweetService.getTweetByUser( offset);
+    public List<TweetDetailDto> getAllTweets() {
+        List<Tweet> tweets = tweetService.getTweetByUser();
         return mapstructMapper.tweetsToTweetDetailsDto(tweets);
     }
 
     @Override
-    public List<TweetDetailDto> getLikedTweets(int offset) {
-        List<Tweet> likedTweets = tweetService.getTweetByUserLikes(offset);
+    public List<TweetDetailDto> getLikedTweets() {
+        List<Tweet> likedTweets = tweetService.getTweetByUserLikes();
         return mapstructMapper.tweetsToTweetDetailsDto(likedTweets);
     }
 
     @Override
-    public List<TweetDetailDto> getTweetsWithMedia(int offset) {
-        List<Tweet> tweetsWithMedia = tweetService.getTweetWithMedia(offset);
+    public List<TweetDetailDto> getTweetsWithMedia() {
+        List<Tweet> tweetsWithMedia = tweetService.getTweetWithMedia();
         return mapstructMapper.tweetsToTweetDetailsDto(tweetsWithMedia);
     }
 
@@ -115,8 +114,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<TweetDetailDto> getUserBookmarks(int offset) {
-        List<Tweet> bookmarkedTweets = tweetService.getTweetByUserLikes(offset);
+    public List<TweetDetailDto> getUserBookmarks() {
+        List<Tweet> bookmarkedTweets = tweetService.getTweetFromBookmarks();
         return mapstructMapper.tweetsToTweetDetailsDto(bookmarkedTweets);
     }
 

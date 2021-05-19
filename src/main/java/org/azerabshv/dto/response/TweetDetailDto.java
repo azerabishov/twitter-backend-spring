@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.azerabshv.models.User;
 
 import javax.persistence.Column;
 import java.util.Date;
@@ -13,6 +14,8 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class TweetDetailDto {
+    private String tweetId;
+    private String userId;
     private String screenName;
     private String username;
     private String avatarUrl;

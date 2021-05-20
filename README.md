@@ -22,7 +22,7 @@ Twitter clone that covers the core features of twitter
 
 
 ## Documentation
-After running application, documentation will be available at http://localhost:8080/swagger-ui.html 
+After running application, documentation will be available at http://localhost:9090/swagger-ui.html 
 
 
 ## Todo
